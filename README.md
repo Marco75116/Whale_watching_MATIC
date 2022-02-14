@@ -9,5 +9,5 @@ We extracted 2.8 M matic transactions on the mainet from etherscan to put them i
 
 Now the goal is to obtain the history of the matic token balance of an address and to know if this address is performing well. This will be done using timestamps and the amount of token matic on the whale transactions as well as the historical price of the token. Once an interesting address has been identified we can look at the composition of its wallet.
 
-Finally, to expose our our our format will be a dashboard. It will be an interactive app where the user can input addresses. We will use graphical charts to give a deep and easy understanding of our results to the user.
+Finally, to expose our work our format will be a dashboard. It will be an interactive app where the user can input addresses. We will use graphical charts to give a deep and easy understanding of our results to the user.
 
