@@ -1,5 +1,7 @@
 # Whale_watching_MATIC
 
+what we used : Python,Sqlite,Angular,FastApi,HighCharts,Etherscan,CryptoCompare,Infura,Postman.
+
 This is a school project I am doing in collaboration with Nasreddine Grimal and Nicolas Dumont. 
 
 This project consists of analyzing the ethereum blockchain to identify and track their movements. We have chosen to focus on the matic token.
@@ -9,4 +11,3 @@ Now the goal is to obtain the history of the matic token balance of an address a
 
 Finally, to expose our our our format will be a dashboard. It will be an interactive app where the user can input addresses. We will use graphical charts to give a deep and easy understanding of our results to the user.
 
-what we used : Python,Sqlite,Angular,FastApi,HighCharts,Etherscan,CryptoCompare,Infura.
