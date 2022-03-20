@@ -1,6 +1,6 @@
 # Whale_watching_MATIC
 
-what we used : Python,Sqlite,Angular,FastApi,HighCharts,Etherscan,CryptoCompare,Infura,Postman.
+what we used : Python,Sqlite,Angular,FastApi,HighCharts,web3,Etherscan,CryptoCompare,Infura,Postman.
 
 This is a school project I am doing in collaboration with Nasreddine Grimal and Nicolas Dumont. 
 
