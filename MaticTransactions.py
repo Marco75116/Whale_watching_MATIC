@@ -173,6 +173,7 @@ def getHistoricalPrice(Timestamp):
           "&limit=1" \
           "&toTs=" + Timestamp
     reponse = requests.get(url)
+    print(reponse.json())
     prices = reponse.json()['Data']['Data']
     price =  ( prices[0]['high'] + prices[0]['low'] + prices[1]['high'] + prices[1]['low'] ) / 4
     return round(price,5)
@@ -186,7 +187,7 @@ def insertBddExploitable(T,retourDecode):
     connection.commit()
     connection.close()
 
-def insertDddTxExceptions(hash):
+def insertBddTxExceptions(hash):
     connection = sqlite3.connect('WhalesEth.db')
     cursor = connection.cursor()
     requete = f"insert into TxException (hash) " \
@@ -215,7 +216,6 @@ def deletedoublon():
         deleteRowByHash(tx[0],connection)
     connection.close()
 
-
 def buildBddExploitable():
     alltx = getAllTx()
     for tx in alltx:
@@ -227,21 +227,104 @@ def buildBddExploitable():
                 print("exception")
                 print(tx['hash'])
 
+def sortAdressbyNounce():
+    connection = sqlite3.connect('WhalesEth.db')
+    cursor = connection.cursor()
+    requeteLastLigne = "SELECT distinct adresseFrom " \
+                       "FROM MaticTransactions " \
+                       "order by nonce DESC " \
+                       "limit 5000"
+    cursor.execute(requeteLastLigne)
+    cursor.execute
+    allTxBrut = cursor.fetchall()
+    connection.commit()
+    connection.close()
+    listRetour = []
+    for address in allTxBrut:
+        listRetour.append(address[0])
+    return listRetour
+
+def InsertBddActiveAdress():
+    listAddress = sortAdressbyNounce()
+    connection = sqlite3.connect('WhalesEth.db')
+    cursor = connection.cursor()
+    for adress in listAddress:
+        requete = f"insert into ActiveAdress (activeAddress) " \
+                  f"values ('{adress}')"
+        cursor.execute(requete)
+    connection.commit()
+    connection.close()
+
+def buildDictTxExploitables(TxBrut):
+    Tx = {
+        "hash": TxBrut[0],
+        "timeStamp": TxBrut[1],
+        "adresseFromE": TxBrut[2],
+        "adresseToE": TxBrut[3],
+        "valueE": TxBrut[4],
+    }
+    return Tx
+
+def getALlTxfromAdressToE(adress):
+    connection = sqlite3.connect('WhalesEth.db')
+    cursor = connection.cursor()
+    inputReverted = (adress,)
+    cursor.execute("SELECT * FROM TxExploitables WHERE adresseToE=? ", inputReverted)
+    allTxBrut = cursor.fetchall()
+    connection.commit()
+    connection.close()
+    listAllTx = []
+    for tx in allTxBrut:
+        listAllTx.append(buildDictTxExploitables(tx))
+    return listAllTx
+
+def getALlTxAdressFromE(adress):
+    connection = sqlite3.connect('WhalesEth.db')
+    cursor = connection.cursor()
+    inputReverted = (adress,)
+    cursor.execute("SELECT * FROM TxExploitables WHERE adresseFromE=? ", inputReverted)
+    allTxBrut = cursor.fetchall()
+    connection.commit()
+    connection.close()
+    listAllTx = []
+    for tx in allTxBrut:
+        listAllTx.append(buildDictTxExploitables(tx))
+    return listAllTx
+
+
+#listTxfrom =getALlTxAdressFromE('0xeC504bfcC11021045598bb24C9DAd5818033bbD4')
+#listTxto= getALlTxfromAdressToE('0xeC504bfcC11021045598bb24C9DAd5818033bbD4')
 
 
 
-#decodeInput({'id': 1966176, 'blockNumber': 13587486, 'timeStamp': '1636533778', 'hash': '0xe6ae831e516687ee3bfead06ec5bfc3d8edb4bddf83e2781f45f9ec2cd56d14e', 'nonce': 2477190, 'blockHash': '0xc8fa039a71aa66436cd3bd9f900ccb1acc9a7fbc406718468d41fe427ce9a573', 'transactionIndex': 84, 'adresseFrom': '0x2faf487a4414fe77e2327f0bf4ae2a264a776ad2', 'adresseTo': '0x7d1afa7b718fb893db30a3abc0cfc608aacfebb0', 'value': 0, 'gas': 71996, 'gasPrice': 123413325512, 'isError': 0, 'txreceipt_status': 1, 'input': '0x', 'contractAddress': '', 'cumulativeGasUsed': 4892522, 'gasUsed': 40197, 'confirmations': 507502})
-# alltx = getAllTx()
-# print("---In---")
-# for tx in alltx:
-#     decodeInput(tx)
+def historicalBalanceValue(address):
+    listTxfrom = getALlTxAdressFromE('0x0084dfd7202e5f5c0c8be83503a492837ca3e95e')
+    listTxto = getALlTxfromAdressToE('0x0084dfd7202e5f5c0c8be83503a492837ca3e95e')
+    Indicateur = []
+    for tx in listTxfrom:
+        Indicateur.append({
+            'timestamp': tx['timeStamp'],
+            'valueModified': -tx['valueE']*getHistoricalPrice(tx['timeStamp'])
+        })
+    for tx in listTxto:
+        Indicateur.append({
+            'timestamp': tx['timeStamp'],
+            'valueModified': +tx['valueE'] * getHistoricalPrice(tx['timeStamp'])
+        })
+    Indicateur = sorted(Indicateur, key=lambda tx:tx['timestamp'])
+    print(Indicateur)
+    return Indicateur
 
 
-# t=[]
-# t.append(getTxByID(255))
-# t.append(getTxByID(255))
-# buildBddExploitable(t)
 
-#buildBddExploitable()
 
-tokenInst = w3.eth.contract()
+def getBenefice(Indicateur):
+    benef = 0
+    for indic in Indicateur:
+        benef += indic['valueModified']
+    print(benef)
+
+Indic = historicalBalanceValue("0xeC504bfcC11021045598bb24C9DAd5818033bbD4")
+
+getBenefice(Indic)
+

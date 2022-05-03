@@ -41,6 +41,15 @@ def buildDictTx(TxBrut):
     }
 
     return Tx
+def buildDictTxExploitables(TxBrut):
+    Tx = {
+        "hash": TxBrut[0],
+        "timeStamp": TxBrut[1],
+        "adresseFromE": TxBrut[2],
+        "adresseToE": TxBrut[3],
+        "valueE": TxBrut[4],
+    }
+    return Tx
 
 
 def getAllTx():
@@ -71,24 +80,24 @@ def getAbiForContract():
     return reponse.json()['result']
 
 
-# #
-connection = sqlite3.connect('WhalesEth.db')
-cursor = connection.cursor()
-requeteLastLigne = "SELECT distinct hash " \
-                   "FROM MaticTransactions " \
-                    \
-
+# # #
+# connection = sqlite3.connect('WhalesEth.db')
+# cursor = connection.cursor()
+# requeteLastLigne = "SELECT distinct hash " \
+#                    "FROM MaticTransactions " \
+#                     \
 #
-cursor.execute(requeteLastLigne)
-# cursor.execute
-# # # adressTo = ('0x7d1afa7b718fb893db30a3abc0cfc608aacfebb0',)
-# # # requeteTxDernierBlock = "SELECT count(*)  " \
-# # #                         "FROM MaticTransactions" \
-# # #                         "WHERE adresseTo = ?"
-# # # cursor.execute("SELECT count(*) FROM MaticTransactions WHERE adresseTo= ?",adressTo)
-lastTx = cursor.fetchall()
-connection.commit()
-connection.close()
+# #
+# cursor.execute(requeteLastLigne)
+# # cursor.execute
+# # # # adressTo = ('0x7d1afa7b718fb893db30a3abc0cfc608aacfebb0',)
+# # # # requeteTxDernierBlock = "SELECT count(*)  " \
+# # # #                         "FROM MaticTransactions" \
+# # # #                         "WHERE adresseTo = ?"
+# # # # cursor.execute("SELECT count(*) FROM MaticTransactions WHERE adresseTo= ?",adressTo)
+# lastTx = cursor.fetchall()
+# connection.commit()
+# connection.close()
 #
 contract = w3.eth.contract(address="0x7D1AfA7B718fb893dB30A3aBc0Cfc608AaCfeBB0", abi=getAbiForContract())
 
@@ -102,5 +111,71 @@ def InsertBddExploitable(T,retourDecode):
     connection.commit()
     connection.close()
 
-print(len(lastTx))
+def getALlTxfromAdressToE(adress):
+    connection = sqlite3.connect('WhalesEth.db')
+    cursor = connection.cursor()
+    inputReverted = (adress,)
+    cursor.execute("SELECT * FROM TxExploitables WHERE adresseToE=? ", inputReverted)
+    allTxBrut = cursor.fetchall()
+    connection.commit()
+    connection.close()
+    print(allTxBrut)
+    listAllTx = []
+    for tx in allTxBrut:
+        listAllTx.append(buildDictTxExploitables(tx))
+    return listAllTx
+
+def getALlTxAdressFromE(adress):
+    connection = sqlite3.connect('WhalesEth.db')
+    cursor = connection.cursor()
+    inputReverted = (adress,)
+    cursor.execute("SELECT * FROM TxExploitables WHERE adresseFromE=? ", inputReverted)
+    allTxBrut = cursor.fetchall()
+    connection.commit()
+    connection.close()
+    listAllTx = []
+    for tx in allTxBrut:
+        listAllTx.append(buildDictTxExploitables(tx))
+    return listAllTx
+
+def sortAdressbyNounce():
+    connection = sqlite3.connect('WhalesEth.db')
+    cursor = connection.cursor()
+    requeteLastLigne = "SELECT distinct adresseFrom " \
+                       "FROM MaticTransactions " \
+                       "order by nonce DESC " \
+                       "limit 5000"
+    cursor.execute(requeteLastLigne)
+    cursor.execute
+    allTxBrut = cursor.fetchall()
+    connection.commit()
+    connection.close()
+    listRetour = []
+    for address in allTxBrut:
+        listRetour.append(address[0])
+    return listRetour
+
+def InsertBddActiveAdress():
+    listAddress = sortAdressbyNounce()
+    connection = sqlite3.connect('WhalesEth.db')
+    cursor = connection.cursor()
+    for adress in listAddress:
+        requete = f"insert into ActiveAdress (activeAddress) " \
+                  f"values ('{adress}')"
+        cursor.execute(requete)
+    connection.commit()
+    connection.close()
+
+
+listTx =getALlTxAdressFromE('0xeC504bfcC11021045598bb24C9DAd5818033bbD4')
+
+def historicalBalanceValue(listTx):
+    Indicateur = []
+    for tx in listTx:
+        Indicateur.append({
+            'timestamp': tx['timeStamp'],
+            'valueModified': tx['valueE']
+        })
+    return Indicateur
+
 
