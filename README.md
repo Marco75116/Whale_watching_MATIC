@@ -9,3 +9,4 @@ Now the goal is to obtain the history of the matic token balance of an address a
 
 Finally, to expose our work our format will be a dashboard. It will be an interactive app where the user can input addresses. We will use graphical charts to give a deep and easy understanding of our results to the user.
 
+<img width=2100 src="https://github.com/Marco75116/Whale_watching_MATIC/blob/main/DASHBOARDangular.png">
