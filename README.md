@@ -10,3 +10,6 @@ Now the goal is to obtain the history of the matic token balance of an address a
 Finally, to expose our work our format will be a dashboard. It will be an interactive app where the user can input addresses. We will use graphical charts to give a deep and easy understanding of our results to the user.
 
 <img width=2100 src="https://github.com/Marco75116/Whale_watching_MATIC/blob/main/DASHBOARDangular.png">
+Unfornately I have reached the limit of the Cryptocompare api that I use to get the historical price of the matic token for every tx. So I can't analyse relevant address with many tx.
+<br>
+<img width=2100 src="https://github.com/Marco75116/Whale_watching_MATIC/blob/main/image.png">
